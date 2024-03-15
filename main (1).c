@@ -1,281 +1,191 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include<time.h>
 
-struct Inventory{
-    int id;
-    char productname[50];
-    int quantity;
-    float price;
-    char date[12];
-}iv;
+struct Student{
+    int rollno;
+    char name[50];
+    int marks1;
+    int marks2;
+    int marks3;
+    int marks4;
+    int marks5;
+    int totalmarks;
+}st;
 
 FILE *fp;
+int num=0;
 
-void addproduct(){
-    char myDate[12];
-    time_t t=time(NULL);
-    struct tm tm = *localtime(&t);
-    sprintf(myDate, "%02d/%02d/%d", tm.tm_mon+1, tm.tm_year+1900);
-    strcpy(iv.date, myDate);
+void add_student(){
+    fp= fopen("student.txt", "ab");
 
-    fp= fopen("product.txt", "ab");
+    printf("enter name: ");
+    scanf("%s", &st.name);
 
-    printf("Enter product id: ");
-    scanf("%d", &iv.id);
+    printf("enter rollno: ");
+    scanf("%d", &st.rollno);
 
-    printf("Enter the product name: ");
-    fflush(stdin);
-    scanf("%s", &iv.productname);
+    int sum=0;
+    int i=0;
+    printf("enter marks1: ");
+    scanf("%d", &st.marks1);
+    printf("enter marks2: ");
+    scanf("%d", &st.marks2);
+    printf("enter marks3: ");
+    scanf("%d", &st.marks3);
+    printf("enter marks4: ");
+    scanf("%d", &st.marks4);
+    printf("enter marks5: ");
+    scanf("%d", &st.marks5);
+    st.totalmarks= st.marks1+ st.marks2+st.marks3+st.marks4+st.marks5;
 
-    printf("Enter product quantity: ");
-    fflush(stdin);
-    scanf("%d", &iv.quantity);
-
-    printf("Enter the product price: ");
-    fflush(stdin);
-    scanf("%f", &iv.price);
-
-    printf("\nProduct added successfully...\n");
-
-    fwrite(&iv, sizeof(iv), 1,fp);
+    printf("student added successfully...\n");
+    num++;
+    fwrite(&st, sizeof(st),1, fp);
     fclose(fp);
 }
 
-void displayproducts(){
-    system("cls");
-    printf("<=== Product List ===>\n\n");
-    printf("%-10s %-30s %-30s %-20s %s\n", "Id", "Product Name", "Quantity", "Price", "Date");
-    printf("\n---------------------------------------------------------------------------------------\n");
+void update_marks(){
+    int roll_no,f;
 
-    fp= fopen("product.txt", "rb");
-    while(fread(&iv, sizeof(iv), 1, fp)==1){
-        printf("%-10d %-30s %-30d %-20f %s\n", iv.id, iv.productname, iv.quantity,iv.price, iv.date);
+    printf("\n-----Update marks-----\n");
+    printf("enter rollno to update: ");
+    scanf("%d", &roll_no);
 
-    }
-    fclose(fp);
-}
+    fp= fopen("student.txt", "rb+");
 
-void updateinventory(){
-    int id,f;
-
-    system("cls");
-    printf("<== Update products ==>\n\n");
-    printf("Enter the product id to update: ");
-    scanf("%d", &id);
-
-    FILE *ft;
-    fp =fopen("product.txt", "rb+");
-
-    while(fread(&iv, sizeof(iv), 1,fp)==1){
-        if(id==iv.id){
+    while(fread(&st, sizeof(st), 1,fp)==1){
+        if(roll_no ==st.rollno){
             f=1;
-            printf("select the operation to be performed\n");
-            printf("1. update the product name\n");
-            printf("2. update the quantity\n");
-            printf("3. update the product price\n");
-            int val;
-            printf("enter your choice: ");
-            scanf("%d", &val);
+            printf("enter the new set of marks\n");
+            int i=0;
+            st.totalmarks=0;
+            printf("enter marks1: ");
+            scanf("%d", &st.marks1);
+            printf("enter marks2: ");
+            scanf("%d", &st.marks2);
+            printf("enter marks3: ");
+            scanf("%d", &st.marks3);
+            printf("enter marks4: ");
+            scanf("%d", &st.marks4);
+            printf("enter marks5: ");
+            scanf("%d", &st.marks5);
+            st.totalmarks= st.marks1+ st.marks2+st.marks3+st.marks4+st.marks5;    
 
-            switch(val){
-                case 1: printf("Enter the product name: ");
-                        fflush(stdin);
-                        scanf("%s",&iv.productname);
-                        break;
-
-                case 2: printf("Enter product quantity: ");
-                        fflush(stdin);
-                        scanf("%d", &iv.quantity);
-                        break;
-
-                case 3: printf("Enter the product price: ");
-                        fflush(stdin);
-                        scanf("%f", &iv.price);
-                        break;
-
-                default: printf("invalid input\n");
-            }
-
-            fseek(fp, -sizeof(iv),1);
-            fwrite(&iv, sizeof(iv), 1, fp);
+            fseek(fp, -sizeof(st),1);
+            fwrite(&st, sizeof(st),1,fp);
             fclose(fp);
             break;
         }
     }
 
     if(f==1){
-        printf("\nProduct updated...\n");
+        printf("\nMarks updated successfully...\n");
 
     }
     else{
-        printf("\nProduct Not Found !!");
+        printf("\nStudent not found...\n");
     }
+
 }
 
-void del(int id){
-    int f=0;
+void display(){
+    system("cls");
+    printf("\n---Student details----\n");
+    printf("%-10s %-30s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Rollno", "Name" ,"Marks1", "Marks2", "Marks3", "Marks4", "Marks5", "Total Marks");
 
-    FILE *ft;
+    fp= fopen("student.txt", "rb");
+    while(fread(&st, sizeof(st), 1, fp)==1){
+        printf("%-10d %-30s %-20d %-20d %-20d %-20d %-20d %-20d\n", st.rollno, st.name, st.marks1,st.marks2, st.marks3, st.marks4, st.marks5, st.totalmarks);
 
-    fp=fopen("product.txt","rb");
-    ft=fopen("temp.txt","wb");
-
-    while(fread(&iv, sizeof(iv), 1,fp) ==1){
-
-        if(id==iv.id){
-            f=1;
-        }
-        else{
-            fwrite(&iv, sizeof(iv),1,ft);
-        }
     }
-
     fclose(fp);
-    fclose(ft);
-
-
-    remove("product.txt");
-    rename("temp.txt", "product.txt");
 }
 
-void deleteproduct(){
-    int id,f;
-
-    system("cls");
-    printf("<== Delete Products ==>\n\n");
-    printf("enter the product id to delete: ");
-    scanf("%d", &id);
-
-    FILE *ft;
-
-    fp=fopen("product.txt", "rb");
-
-    while(fread(&iv, sizeof(iv), 1,fp)==1){
-
-        if(id==iv.id){
-            f=1;
-            fclose(fp);
-            break;
-        }
-
-    }
-
-    if(f==1){
-        printf("product deleted successfully...\n");
-        del(id);
-
-    }
-    else{
-        printf("\n\nProduct Not Found !!");
-    }
-}
-
-void administrator(){
+void teacher(){
     int val;
-    printf("\n");
-    printf("1. add product\n");
-    printf("2. update inventory\n");
-    printf("3. delete product\n");
-    printf("4. display products\n");
+    printf("\n1. add student\n");
+    printf("2. update marks\n");
+    printf("3. display marks\n");
 
-    scanf("%d",&val);
-    switch(val){
-        case 1: addproduct();
-                break;
-        case 2: updateinventory();
-                break;
-        case 3: deleteproduct();
-                break;
-        case 4: displayproducts();
-                break;
-        default :printf("invalid input\n");
-    }
-}
-
-void buy(){
-    int id,f=0,quant;
-    system("cls");
-    printf("<== Buy products ==>\n\n");
-    printf("enter the product id to buy: ");
-    scanf("%d",&id);
-    printf("enter the quantity of the product: ");
-    scanf("%d",&quant);
-
-
-    FILE *ft;
-    float p;
-    fp=fopen("product.txt", "rb+");
-
-    while(fread(&iv, sizeof(iv), 1,fp)==1){
-        if(id==iv.id){
-            p=iv.price;
-            if(iv.quantity-quant<0){
-                printf("Insufficient quantity available\n");
-                return;
-            }
-            else if(iv.quantity-quant>=0){
-                f=1;
-                iv.quantity=iv.quantity-quant;
-                fseek(fp, -sizeof(iv),1);
-                fwrite(&iv, sizeof(iv),1, fp);
-                fclose(fp);
-                if(iv.quantity==0){
-                    del(iv.id);
-                }
-                break;
-            }
-        }
-    }
-
-    if(f==1){
-        printf("<===== Here is the invoice =====>\n");
-        printf("Total amount payable: %f\n", p*quant);
-        printf("Product bought successfully...\n");
-    }
-    else{
-        printf("Product Not Found !!\n");
-    }
-}
-
-void customer(){
-    int val;
-    printf("1. buy product\n");
-    printf("2. view product inventory\n");
-    printf("enter the choice: ");
+    printf("enter choice: ");
     scanf("%d", &val);
 
     switch(val){
-        case 1: buy();
+        case 1: add_student();
                 break;
-        case 2: displayproducts();
+        case 2: update_marks();
+                break;
+        case 3: display();
                 break;
         default: printf("invalid input\n");
     }
 }
+/*
+void display_result(){
+    fp= fopen("student.txt", "rb+");
+    struct Student student_arr[num];
+    int k=0;   
+    while(fread(&st, sizeof(st), 1,fp)==1){
+        //struct Student newstudent=
 
 
+        newstudent.rollno= st.rollno;
+        newstudent.name= st.name;
+        newstudent.marks1=st.marks1;
+        newstudent.marks2=st.marks2;
+        newstudent.marks3=st.marks3;
+        newstudent.marks4=st.marks4;
+        newstudent.marks5=st.marks5;
+        newstudent.totalmarks=st.totalmarks;
+
+        //student_arr[k++]={st.rollno, st.name, st.marks1,st.marks2, st.marks3, st.marks4, st.marks5, st.totalmarks};
+
+    }
+
+    fclose(fp);
+    int i,j;
+    for (i = 0; i < num- 1; i++) {
+        for (j = 0; j < num - i - 1; j++) {
+            if (student_arr[j].totalmarks < student_arr[j + 1].totalmarks) {
+                struct Student temp = student_arr[j];
+                student_arr[j] = student_arr[j + 1];
+                student_arr[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nAll Student Details Sorted by Total Marks:\n");
+    printf("%-10s %-30s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Rollno", "Name" ,"Marks1", "Marks2", "Marks3", "Marks4", "Marks5", "Total Marks");
+    for (i = 0; i < num; i++) {
+          printf("%-10d %-30s %-20d %-20d %-20d %-20d %-20d %-20d\n", student_arr[i].rollno, student_arr[i].name, student_arr[i].marks1,student_arr[i].marks2, student_arr[i].marks3, student_arr[i].marks4, student_arr[i].marks5, student_arr[i].totalmarks);
+
+    }
+}
+*/
+
+void student(){
+    display();
+}
 
 int main(){
     int val;
 
     while(1){
-        printf("1. Administator\n");
-        printf("2. Customer\n");
-        printf("0. Exit\n");
-        printf("-->Enter your choice: ");
-        scanf("%d",&val);
+        printf("\n1. teacher\n");
+        printf("2. student\n");
+        printf("0. exit\n");
+
+        printf("enter choice: ");
+        scanf("%d", &val);
 
         switch(val){
-            case 1: administrator();
+            case 1: teacher();
                     break;
-            case 2: customer();
+            case 2: student();
                     break;
             case 0: exit(0);
             default: printf("invalid input\n");
         }
     }
-
-    return 0;
 }
